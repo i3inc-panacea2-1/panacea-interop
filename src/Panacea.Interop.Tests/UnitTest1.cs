@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Panacea.Communications;
 using Panacea.Interop;
 
 namespace Panacea.Interop.Tests
