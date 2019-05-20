@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace Panacea.Interop
 {
     public class ProcessInteropChannel: IProcessInteropChannel
