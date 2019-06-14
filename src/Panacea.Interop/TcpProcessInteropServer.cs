@@ -14,7 +14,7 @@ namespace Panacea.Interop
 
         public TcpProcessInteropServer(int port)
         {
-            _tcpListener = new TcpListener(IPAddress.Any, port);
+            _tcpListener = new TcpListener(IPAddress.Loopback, port);
             try
             {
                 _tcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);

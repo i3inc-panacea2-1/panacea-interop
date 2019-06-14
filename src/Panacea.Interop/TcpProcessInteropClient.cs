@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +13,8 @@ namespace Panacea.Interop
         TcpClient _tcpClient;
         int _port;
         string _hostname;
-        public TcpProcessInteropClient(string hostname, int port)
+        public TcpProcessInteropClient(int port)
         {
-            _hostname = hostname;
             _port = port;
             _tcpClient = new TcpClient();
             _tcpClient.NoDelay = true;
@@ -27,7 +27,7 @@ namespace Panacea.Interop
         {
             try
             {
-                var task = _tcpClient.ConnectAsync(_hostname, _port);
+                var task = _tcpClient.ConnectAsync(IPAddress.Loopback, _port);
                 task.Wait(timeout);
                 stream = _tcpClient.GetStream();
                 return Task.FromResult(true);
@@ -45,7 +45,7 @@ namespace Panacea.Interop
 
         public override void Dispose()
         {
-            
+
             Disconnect();
             _tcpClient.Dispose();
             base.Dispose();

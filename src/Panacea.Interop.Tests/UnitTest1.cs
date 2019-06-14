@@ -10,7 +10,7 @@ namespace Panacea.Interop.Tests
     [TestClass]
     public class UnitTest1:IDisposable
     {
-        TcpProcessInteropClient _client = new TcpProcessInteropClient("localhost", 1800);
+        TcpProcessInteropClient _client = new TcpProcessInteropClient(1800);
         TcpProcessInteropServer _server = new TcpProcessInteropServer(1800);
 
         public UnitTest1()
