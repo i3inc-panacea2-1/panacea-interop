@@ -12,7 +12,6 @@ namespace Panacea.Interop
     {
         TcpClient _tcpClient;
         int _port;
-        string _hostname;
         public TcpProcessInteropClient(int port)
         {
             _port = port;
