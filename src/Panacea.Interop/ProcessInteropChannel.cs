@@ -171,8 +171,10 @@ namespace Panacea.Interop
             return await task;
         }
 
+        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         private void Write(int type, int id, string uri, params object[] args)
         {
+            semaphoreSlim.Wait();
             try
             {
                 var str = JsonSerializer.SerializeToString(new Message() { Type = type, Id = id, Uri = uri, Args = args });
@@ -184,10 +186,15 @@ namespace Panacea.Interop
                 OnError(ex);
                 OnClose();
             }
+            finally
+            {
+                semaphoreSlim.Release();
+            }
         }
 
         private async Task WriteAsync(int type, int id, string uri, params object[] args)
         {
+            await semaphoreSlim.WaitAsync();
             try
             {
                 var str = JsonSerializer.SerializeToString(new Message() { Type = type, Id = id, Uri = uri, Args = args });
@@ -198,6 +205,10 @@ namespace Panacea.Interop
             {
                 OnError(ex);
                 OnClose();
+            }
+            finally
+            {
+                semaphoreSlim.Release();
             }
         }
 
