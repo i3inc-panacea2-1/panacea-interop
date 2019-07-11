@@ -8,6 +8,8 @@ namespace Panacea.Interop
 {
     public interface IProcessInteropChannel:IDisposable
     {
+        event EventHandler<Exception> Error;
+
         event EventHandler Closed;
 
         void Start();

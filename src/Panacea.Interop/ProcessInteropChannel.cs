@@ -24,6 +24,7 @@ namespace Panacea.Interop
         Dictionary<string, Func<object[], Task<object[]>>> _registrationsAsync = new Dictionary<string, Func<object[], Task<object[]>>>();
         Dictionary<string, Action<object[]>> _subscriptions = new Dictionary<string, Action<object[]>>();
         public event EventHandler Closed;
+        public event EventHandler<Exception> Error;
 
         protected ProcessInteropChannel()
         {
@@ -79,8 +80,9 @@ namespace Panacea.Interop
                     OnMessageReceived(JsonSerializer.DeserializeFromString<Message>(text.Trim('\0').Replace("\u200B", "")));
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                OnError(ex);
                 OnClose();
             }
         }
@@ -177,8 +179,9 @@ namespace Panacea.Interop
                
                 _writer.WriteLine(str);
             }
-            catch
+            catch(Exception ex)
             {
+                OnError(ex);
                 OnClose();
             }
         }
@@ -191,8 +194,9 @@ namespace Panacea.Interop
                 
                 await _writer.WriteLineAsync(str);
             }
-            catch
+            catch(Exception ex)
             {
+                OnError(ex);
                 OnClose();
             }
         }
@@ -202,6 +206,11 @@ namespace Panacea.Interop
         public void ReleaseSubscriptions()
         {
             _subscriptions.Clear();
+        }
+
+        protected void OnError(Exception ex)
+        {
+            Error?.Invoke(this, ex);
         }
 
         protected virtual void OnClose()
