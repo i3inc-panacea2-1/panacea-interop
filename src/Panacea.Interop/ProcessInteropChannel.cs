@@ -194,6 +194,8 @@ namespace Panacea.Interop
 
         private async Task WriteAsync(int type, int id, string uri, params object[] args)
         {
+            if (_writer == null)
+                throw new NullReferenceException("Writer is null");
             await semaphoreSlim.WaitAsync();
             try
             {
