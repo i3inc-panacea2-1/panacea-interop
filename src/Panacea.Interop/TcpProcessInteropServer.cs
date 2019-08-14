@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Panacea.Interop
@@ -28,23 +29,31 @@ namespace Panacea.Interop
 
         public string ConnectionId => (_tcpListener.LocalEndpoint as IPEndPoint)?.Port.ToString();
 
-        public Task<bool> ConnectAsync(int timeout)
+        public async Task<bool> ConnectAsync(int timeout)
         {
+            var cancellationCompletionSource = new TaskCompletionSource<bool>();
             try
             {
-                var task = _tcpListener.AcceptTcpClientAsync();
-                if (task.Wait(timeout))
+                using (var cts = new CancellationTokenSource(timeout))
                 {
-                    var client = task.Result;
-                    stream = client.GetStream();
-                    return Task.FromResult(true);
+                    var task = _tcpListener.AcceptTcpClientAsync();
+
+                    using (cts.Token.Register(() => cancellationCompletionSource.TrySetResult(true)))
+                    {
+                        if (task != await Task.WhenAny(task, cancellationCompletionSource.Task))
+                        {
+                            throw new OperationCanceledException(cts.Token);
+                        }
+                        stream = task.Result.GetStream();
+                        return true;
+                    }
                 }
             }
-            catch
+            catch (OperationCanceledException)
             {
-                
+
             }
-            return Task.FromResult(false);
+            return false;
         }
 
         public void Disconnect()
